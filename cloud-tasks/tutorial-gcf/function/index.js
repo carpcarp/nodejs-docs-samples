@@ -16,6 +16,7 @@
 
 // [START cloud_tasks_func]
 const sendgrid = require('@sendgrid/mail');
+const axios = require('axios');
 
 /**
  * Responds to an HTTP request from Cloud Tasks and sends an email using data
@@ -30,15 +31,15 @@ const sendgrid = require('@sendgrid/mail');
  */
 exports.sendEmail = async (req, res) => {
   // Get the SendGrid API key from the environment variable.
-  const key = process.env.SENDGRID_API_KEY;
-  if (!key) {
-    const error = new Error(
-      'SENDGRID_API_KEY was not provided as environment variable.'
-    );
-    error.code = 401;
-    throw error;
-  }
-  sendgrid.setApiKey(key);
+//   const key = process.env.SENDGRID_API_KEY;
+//   if (!key) {
+//     const error = new Error(
+//       'SENDGRID_API_KEY was not provided as environment variable.'
+//     );
+//     error.code = 401;
+//     throw error;
+//   }
+//   sendgrid.setApiKey(key);
 
   // Get the body from the Cloud Task request.
   const {to_email, to_name, from_name} = req.body;
@@ -65,7 +66,23 @@ exports.sendEmail = async (req, res) => {
   };
 
   try {
-    await sendgrid.send(msg);
+//     await sendgrid.send(msg);
+
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'https://webhook.site/76a77730-f4a9-4e42-a9b8-e40df12e4c07',
+      headers: { }
+    };
+
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
     // Send OK to Cloud Task queue to delete task.
     res.status(200).send('Postcard Sent!');
   } catch (error) {
